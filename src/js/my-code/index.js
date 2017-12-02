@@ -9,7 +9,8 @@ class Artwork {
     const height = svg.getAttribute('height');
     const stormContent = generateStorm(width, height);
 
-    svg.innerHTML = stormContent;
+    // for first page rendering
+    setTimeout(() => svg.innerHTML = stormContent, 1000);
   }
 }
 
