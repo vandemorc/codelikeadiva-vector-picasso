@@ -12,6 +12,7 @@ const MAX_RADIUS = 120;
 const MAX_EMOJI_SIZE = 15;
 const MIN_EMOJI_SIZE = 1;
 const DEVIATION_MULTIPLIER = 1.5;
+const MINIMUM_DEVIATION = .05;
 const ANGLE_STEP = 13;
 const RADIUS_STEP = .3;
 const SWIRL_COUNT = 16;
@@ -73,8 +74,10 @@ export function generateStorm(width, height) {
     .join('');
   const emojisSwirls = Array(SWIRL_COUNT).fill(0)
     .map((_, index) => (generateSwirl({
-      maxDeviation: easingSin(1 - index / maxSwirlIndex) * DEVIATION_MULTIPLIER,
-      maxEmojiSize: (index / maxSwirlIndex) * MAX_EMOJI_SIZE + MIN_EMOJI_SIZE,
+      maxDeviation: (
+        (MINIMUM_DEVIATION + easingSin(1 - index / maxSwirlIndex)) * DEVIATION_MULTIPLIER
+      ),
+      maxEmojiSize: easingSin(index / maxSwirlIndex) * MAX_EMOJI_SIZE + MIN_EMOJI_SIZE,
       // generate emojis with trails
       svgElementsGenerator: stepOptions => [
         generateLine(stepOptions),
