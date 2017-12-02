@@ -9,7 +9,7 @@ import {
 
 // magic numbers
 const MAX_RADIUS = 120;
-const MAX_EMOJI_SIZE = 12;
+const MAX_EMOJI_SIZE = 15;
 const MIN_EMOJI_SIZE = 1;
 const DEVIATION_MULTIPLIER = 1.5;
 const ANGLE_STEP = 13;

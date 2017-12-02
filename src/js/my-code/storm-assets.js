@@ -81,7 +81,7 @@ export const generateRandomDot = ({x, y, r, a}) => r < .75 ? '' : `
   <circle 
     cx="${x + Math.random() * r * 8 - r * 4}" 
     cy="${y + Math.random() * r * 8 - r * 4}" 
-    r="${r / 3 + Math.random() * 3}" 
+    r="${r / 5 + Math.random() * r / 2}" 
     fill="${PHOTON_COLOR}"
     opacity="${Math.random() * .5 + .1}"
     transform="skewX(${-15 + Math.random() * 30}) skewY(${-15 + Math.random() * 30})"
