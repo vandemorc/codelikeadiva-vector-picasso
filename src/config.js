@@ -1,7 +1,7 @@
 const config = {
   author: "Maksims Strašinskis",
   title: "Emojional Storm",
-  instructions: "storm-generator.js"
+  instructions: "Random storm generation function - storm-generator.js"
 };
 
 export default config;

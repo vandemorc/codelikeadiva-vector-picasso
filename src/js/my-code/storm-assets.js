@@ -23,6 +23,8 @@ const getRandomEmoji = () => {
     return getRandomEmoji();
   }
 
+  lastRandomEmoji = index;
+
   return EMOJIS[index];
 }
 
