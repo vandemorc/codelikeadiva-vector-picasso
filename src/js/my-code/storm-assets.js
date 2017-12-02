@@ -93,17 +93,20 @@ export const generateStormWrapper = ({content, width, height}) => `
   <svg x="0" y="0" width="${width}" height="${height}" viewBox="0 0 100 100" fill="black">
   
     <defs>          
+      <!--emoji trail-->
       <linearGradient id="trailGradient" x1="1" y1="0" x2="0" y2="0">
         <stop stop-color="${TRAIL_COLOR}" offset="0%" stop-opacity="0.15"/>
         <stop stop-color="${TRAIL_COLOR}"  offset="100%" stop-opacity="0" />
       </linearGradient>
       
+      <!--decrease saturation-->
       <filter id="colorSaturate">
         <feColorMatrix in="SourceGraphic"
             type="saturate"
             values=".9" />
       </filter>
       
+      <!--background light-->
       <filter id = "spotlight">
         <feSpecularLighting result="specOut"
             specularExponent="30" lighting-color="${LIGHT_COLOR}">
