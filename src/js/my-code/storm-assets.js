@@ -15,12 +15,12 @@ const PHOTON_COLOR = '#ffe';
 const BACKGROUND_COLOR = '#231b00';
 
 let lastRandomEmoji = null;
-const getRandomEmoji = () => {
-  const index = Math.floor(Math.random() * EMOJIS.length);
+const getRandomEmoji = (random) => {
+  const index = Math.floor(random() * EMOJIS.length);
 
   // prevent same emojis in a row
   if (EMOJIS.length > 1 && index === lastRandomEmoji) {
-    return getRandomEmoji();
+    return getRandomEmoji(random);
   }
 
   lastRandomEmoji = index;
@@ -28,7 +28,7 @@ const getRandomEmoji = () => {
   return EMOJIS[index];
 }
 
-const getRandomEmojiColor = () => EMOJI_COLORS[Math.floor(Math.random() * EMOJI_COLORS.length)];
+const getRandomEmojiColor = (random) => EMOJI_COLORS[Math.floor(random() * EMOJI_COLORS.length)];
 
 const generateFakeEmoji = ({x, y, r, color}) => `
   <circle 
@@ -50,13 +50,30 @@ const generateEmojiText = ({x, y, r, a, emoji}) => `
 `;
 
 // use fake emojies for performance
-export const generateEmoji = ({x, y, r, a}) => {
-  return r < .2
-    ? generateFakeEmoji({x, y, r, color: getRandomEmojiColor()})
-    : generateEmojiText({
-      x, y, r,
-      a: a + 90 + - 5 + Math.random() * 10,
-      emoji: getRandomEmoji()});
+export const generateEmoji = ({x, y, r, a, renderedArea, random}) => {
+  if (r < .2) {
+    return generateFakeEmoji({x, y, r, color: getRandomEmojiColor(random)});
+  }
+
+  // generate to not break random seed increment
+  const emojiText = generateEmojiText({
+    x, y, r,
+    a: a + 90 + - 5 + random() * 10,
+    emoji: getRandomEmoji(random),
+  });
+
+  const isInRenderArea = (
+    x + r >= renderedArea.x0 &
+    x - r <= renderedArea.x1 & 
+    y + r >= renderedArea.y0 &
+    y - r <= renderedArea.y1 &
+    true
+  );
+
+  return isInRenderArea
+    // ? generateFakeEmoji({x, y, r, color: getRandomEmojiColor(random)})
+    ? emojiText
+    : '';
 };
 
 // transform="rotate(${a} ${x} ${y})"
@@ -77,20 +94,20 @@ export const generateTrail = ({x, y, r, a}) => `
  `;
 
 // skipt too small elements to not pollute the center
-export const generateRandomDot = ({x, y, r, a}) => r < .75 ? '' : `
+export const generateRandomDot = ({x, y, r, a, random}) => r < .75 ? '' : `
   <circle 
-    cx="${x + Math.random() * r * 8 - r * 4}" 
-    cy="${y + Math.random() * r * 8 - r * 4}" 
-    r="${r / 5 + Math.random() * r / 2}" 
+    cx="${x + random() * r * 8 - r * 4}" 
+    cy="${y + random() * r * 8 - r * 4}" 
+    r="${r / 5 + random() * r / 2}" 
     fill="${PHOTON_COLOR}"
-    opacity="${Math.random() * .5 + .1}"
-    transform="skewX(${-15 + Math.random() * 30}) skewY(${-15 + Math.random() * 30})"
+    opacity="${random() * .5 + .1}"
+    transform="skewX(${-15 + random() * 30}) skewY(${-15 + random() * 30})"
   />
 `;
 
 // wrapper template with filters
-export const generateStormWrapper = ({content, width, height}) => `
-  <svg x="0" y="0" width="${width}" height="${height}" viewBox="0 0 100 100" fill="black">
+export const generateStormWrapper = ({content, width, height, localWidth, localHeight}) => `
+  <svg x="0" y="0" width="${width}" height="${height}" viewBox="0 0 ${localWidth} ${localHeight}">
   
     <defs>          
       <!--emoji trail-->
@@ -110,15 +127,19 @@ export const generateStormWrapper = ({content, width, height}) => `
       <filter id = "spotlight">
         <feSpecularLighting result="specOut"
             specularExponent="30" lighting-color="${LIGHT_COLOR}">
-          <fePointLight x="50" y="50" z="100"/>
-        </feSpecularLighting>
+          <fePointLight
+            x="${localWidth / 2}"
+            y="${localHeight / 2}"
+            z="${Math.sqrt(localWidth * localWidth + localHeight * localHeight) * .65}"
+          />
+            </feSpecularLighting>
         <feComposite in="SourceGraphic" in2="specOut"
             operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
       </filter>              
     </defs>  
               
     <g filter="url(#spotlight)">
-      <rect id="background" x="${(100 - width) / 2}" y="${(100 - height) / 2}" width="${width}" height="${height}" fill="${BACKGROUND_COLOR}" />
+      <rect id="background" x="${0}" y="${0}" width="${localWidth}" height="${localHeight}" fill="${BACKGROUND_COLOR}" />
     </g>
     <g filter="url(#colorSaturate)">
       ${content}
