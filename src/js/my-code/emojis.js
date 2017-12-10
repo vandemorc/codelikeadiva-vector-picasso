@@ -75,7 +75,7 @@ export const EMOJIS = [
   '😷',
   '🤒',
   '🤕',
-  '🤢',
+  // '🤢',too green
   '🤮',
   // '🤧',
   '😇',
