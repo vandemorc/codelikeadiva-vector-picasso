@@ -39,3 +39,16 @@ Bitte achte hierbei darauf, die selbe E-Mailadresse wie bei deiner Anmeldung zu 
 
 ## Hast du Fragen?
 Dann schreib uns einfach eine [E-Mail](mailto:codelikea@diva-e.com)!
+
+## How to export in heigh resolution
+The svg has too many layers, so it is not easy to resize it using vector editor app.
+Unfortunately js canvas export noticeably decrease the quality.
+
+Easy steps to export without loss of quality:  
+1. use hash parameters to render only part of the image (http://localhost:8080/#0,5 == first tile from 5x5)
+2. rename the svg using pattern [tile index]-[tile count].svg (e.g. first tile from 5x5 - "00-25.svg", second "01-25.svg", etc)
+3. copy svg tiles to src/js/my-code/tools/
+4. for 5x5 tiles export open index_by_25.html
+5. use <select> to select the tile. Then right-click on the image and "Copy Image"
+6. paste it in your favourite photo editor to combine raster parts together.
+7. save combined image as png/jpg/...
