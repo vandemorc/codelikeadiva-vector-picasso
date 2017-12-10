@@ -9,7 +9,6 @@ import {
 import { Random } from "./random";
 
 // consts
-// local coordinate system: [0..100][0..100]
 // TODO: read from dom
 const hwRatio = 596 / 842;
 const LOCAL_WIDTH = 100;
@@ -18,6 +17,8 @@ const xCenter = LOCAL_WIDTH * .5;
 const yCenter = LOCAL_HEIGHT * .5;
 
 // magic numbers
+// 3 2 32 512 256 1 12345
+const Randomizer = new Random(13);
 const MAX_RADIUS = Math.sqrt(LOCAL_WIDTH * LOCAL_WIDTH + LOCAL_HEIGHT * LOCAL_HEIGHT);
 const MAX_EMOJI_SIZE = 17;
 const MIN_EMOJI_SIZE = 1;
@@ -34,7 +35,7 @@ function generateSwirl({maxDeviation, maxEmojiSize, svgElementsGenerator, render
   let angle = 0;
   let skipIndex = 0;
 
-  while (radius < MAX_RADIUS * 1.35) {
+  while (radius < MAX_RADIUS * 1.75) {
     const mult = easingSin(radius / MAX_RADIUS);
     const easeRadius = mult * MAX_RADIUS;
     const xPerfect = xFromCenter(angle, easeRadius);
@@ -67,11 +68,16 @@ function generateSwirl({maxDeviation, maxEmojiSize, svgElementsGenerator, render
   return svgElements.join('');
 }
 
-export function generateStorm(width, height, partIndex = 0, dividedBy = 1) {
-  const Randomizer = new Random(0);
+export function generateStorm(width, height) {
   const random = Randomizer.next.bind(Randomizer);
   const maxSwirlIndex = SWIRL_COUNT - 1;
-  // optimization
+  // rendering limitation
+  const parts = window.location.hash.replace('#','').split(',');
+  const partIndex = parts.length === 2 ? +parts[0] : 0;
+  const dividedBy = parts.length === 2 ? +parts[1] : 1;
+
+  console.log(`partIndex:${partIndex} / ${dividedBy * dividedBy}`);
+
   const partCount = dividedBy * dividedBy;
   const partX = partIndex % dividedBy;
   const partY = Math.floor(partIndex / dividedBy);
@@ -82,6 +88,8 @@ export function generateStorm(width, height, partIndex = 0, dividedBy = 1) {
     y0: partY * partHeight,
     x1: partX * partWidth + partWidth,
     y1: partY * partHeight + partHeight,
+    xMax: LOCAL_WIDTH,
+    yMax: LOCAL_HEIGHT,
   };
   const photonsSwirls = Array(SWIRL_COUNT).fill(0)
     .map((_, index) => (generateSwirl({
@@ -93,6 +101,7 @@ export function generateStorm(width, height, partIndex = 0, dividedBy = 1) {
       ],
       random,
     })))
+    // .filter((t, i) => false)
     .join('');
   const emojisSwirls = Array(SWIRL_COUNT).fill(0)
     .map((_, index) => (generateSwirl({
@@ -103,12 +112,15 @@ export function generateStorm(width, height, partIndex = 0, dividedBy = 1) {
       maxEmojiSize: easingSin(index / maxSwirlIndex) * MAX_EMOJI_SIZE + MIN_EMOJI_SIZE,
       // generate emojis with trails
       svgElementsGenerator: stepOptions => [
-        generateLine(stepOptions),
-        generateTrail(stepOptions),
+        // lines and trails only for big emojis
+        stepOptions.r >= .2 && generateLine(stepOptions),
+        stepOptions.r >= .2 && generateTrail(stepOptions),
         generateEmoji(stepOptions),
       ],
       random,
     })))
+    .filter(t => t)
+    // .filter((t, i) => i < 1)
     .join('');
 
   return generateStormWrapper({
@@ -117,5 +129,8 @@ export function generateStorm(width, height, partIndex = 0, dividedBy = 1) {
     height,
     localWidth: LOCAL_WIDTH,
     localHeight: LOCAL_HEIGHT,
+    partIndex,
+    dividedBy,
+    renderedArea,
   });
 };
