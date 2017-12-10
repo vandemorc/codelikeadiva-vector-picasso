@@ -62,7 +62,13 @@ class Project {
   }
 
   generateMenu() {
-    const menu = `<div id="menu"><a href="#">save artwork</a><p>or press key: <span class="key">P</span></p></div>`;
+    const menu = (`
+<div id="menu">
+  <a href="#">save artwork</a><p>or press key: <span class="key">P</span></p>
+  <hr>
+  <p><span class="key">E</span> export as PNG</p>
+</div>
+    `);
     document.getElementsByTagName('body')[0].insertAdjacentHTML('beforeend', menu);
 
     this.downloadLink = document.querySelector('#menu a');
