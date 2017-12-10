@@ -20,7 +20,40 @@ class Project {
         this.saveArtwork();
         this.triggerSaveArtwork();
       }
+
+      // e - for export
+      if (event.key === 'e') {
+        this.exportAsPNG();
+      }
     });
+  }
+
+  exportAsPNG() {
+    const svg  = document.querySelector('#artwork-wrapper>svg');
+    const svgSize = svg.getBoundingClientRect();
+    const xml  = new XMLSerializer().serializeToString(svg);
+    const data = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(xml)));
+    const canvas = document.createElement( 'canvas' );
+    const ctx = canvas.getContext( '2d' );
+    const img  = new Image();
+
+    // document.write('<img src="'+data+'"/>');
+
+    img.setAttribute('src', data);
+    // document.body.appendChild(img);
+
+    img.onload = function() {
+      canvas.width = svgSize.width;
+      canvas.height = svgSize.height;
+      ctx.drawImage(img, 0, 0 );
+
+      const canvasdata = canvas.toDataURL('image/png', 1.0);
+      const a = document.createElement('a');
+      a.download = 'export_'+Date.now()+'.png';
+      a.href = canvasdata;
+      document.body.appendChild(a);
+      a.click();
+    };
   }
 
   updateCredits() {
