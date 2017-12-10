@@ -17,7 +17,6 @@ const xCenter = LOCAL_WIDTH * .5;
 const yCenter = LOCAL_HEIGHT * .5;
 
 // magic numbers
-// 3 2 32 512 256 1 12345
 const Randomizer = new Random(13);
 const MAX_RADIUS = Math.sqrt(LOCAL_WIDTH * LOCAL_WIDTH + LOCAL_HEIGHT * LOCAL_HEIGHT);
 const MAX_EMOJI_SIZE = 17;
